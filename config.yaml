@@ -1,0 +1,3 @@
+data_source: "yfinance"
+csv_file_path: "./portfolio.csv"
+retry_attempts: 3
