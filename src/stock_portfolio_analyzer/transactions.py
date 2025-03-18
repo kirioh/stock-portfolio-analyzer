@@ -48,8 +48,14 @@ def parse_statement_transactions(statement_text: str) -> pd.DataFrame:
         try:
             # Extract date (format: DD MMM YYYY HH:MM:SS AEDT)
             date_str = " ".join(parts[:5])
-            # Convert to datetime
-            date = datetime.datetime.strptime(date_str, "%d %b %Y %H:%M:%S %Z")
+            # Convert to datetime - handle timezone manually since strptime can't reliably parse timezone abbreviations
+            try:
+                # Try parsing with timezone first
+                date = datetime.datetime.strptime(date_str, "%d %b %Y %H:%M:%S %Z")
+            except ValueError:
+                # If that fails, parse without timezone and handle it separately
+                base_date_str = " ".join(parts[:4])
+                date = datetime.datetime.strptime(base_date_str, "%d %b %Y %H:%M:%S")
             
             # Extract other fields
             symbol = parts[5] if parts[5] != "Cash" else ""

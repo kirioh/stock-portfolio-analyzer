@@ -127,11 +127,13 @@ def fetch_prices_for_dates(symbols: List[str], dates: List[datetime.datetime],
         # For each target date, find the closest available price date
         for target_date in dates:
             # Convert target date to datetime64 for comparison with DataFrame index
-            target_datetime64 = pd.Timestamp(target_date)
+            # Make timezone naive for consistent comparison
+            target_datetime64 = pd.Timestamp(target_date).tz_localize(None)
             
             # Find the closest date in the historical data (on or before the target date)
             # This handles weekends and holidays when markets are closed
-            available_dates = hist_df.index[hist_df.index <= target_datetime64]
+            # Convert index to naive timestamps for comparison
+            available_dates = hist_df.index[hist_df.index.tz_localize(None) <= target_datetime64]
             
             if len(available_dates) > 0:
                 closest_date = available_dates[-1]  # Most recent date on or before target
